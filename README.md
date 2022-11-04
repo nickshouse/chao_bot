@@ -1,1 +1,1 @@
-# chao_bot
+# Chao Bot for Discord
