@@ -1,46 +1,68 @@
-# Imports
-import os
-import discord
+# Some notes...
+# @client.tree.command() registers a command to the CommandTree
+
+from typing import Optional
+import typing
+
 import bot_token
-import asyncio
+import discord
+from discord import app_commands
 from discord.ext import commands
-from discord import Interaction
-
-# All commands must start with !
-intents = discord.Intents.all()
-intents.members = True
-client = commands.Bot(command_prefix="!", case_insensitive=True, intents = discord.Intents.all())
-client.remove_command("help")
 
 
-async def load_extensions():
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            await client.load_extension(f"cogs.{filename[:-3]}")
+MY_GUILD = discord.Object(id=815388895994839071)  # replace with your guild id
 
 
-@client.event
+class MyBot(commands.Bot):
+    def __init__(self):
+        super().__init__(intents=discord.Intents.default(), command_prefix="!")
+
+
+bot = MyBot()
+
+
+@bot.event
 async def on_ready():
-    await client.change_presence(status=discord.Status.online, activity=discord.Activity(name=f"/chao", type=discord.ActivityType.playing))
-    print("Chao Bot is online")
-    try:
-        synced = await client.tree.sync()
-        print(f"Synced len({synced}) commands")
-    except Exception as e:
-        print(f"Error syncing commands: {e}")
-
-@client.event
-async def on_command_error(ctx, error):
-    print(f"An error occured: {str(error)}")
-    
-@client.tree.command(name="hello")
-async def hello(interaction: Interaction):
-    await interaction.response.send_message("Hello!")
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    print('------')
 
 
-async def main():
-    await load_extensions()
-    await client.start(bot_token.your_bot_token)
+@bot.tree.command()
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message(f'Hi, {interaction.user.mention}')
 
 
-asyncio.run(main())
+# Sync command, DM the bot
+@bot.command()
+@commands.is_owner()
+async def sync(
+  ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[typing.Literal["~", "*", "^"]] = None) -> None:
+    if not guilds:
+        if spec == "~":
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "*":
+            ctx.bot.tree.copy_global_to(guild=ctx.guild)
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "^":
+            ctx.bot.tree.clear_commands(guild=ctx.guild)
+            await ctx.bot.tree.sync(guild=ctx.guild)
+            synced = []
+        else:
+            synced = await ctx.bot.tree.sync()
+
+        await ctx.send(f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}")
+        return
+
+    ret = 0
+    for guild in guilds:
+        try:
+            await ctx.client.tree.sync(guild=guild)
+        except discord.HTTPException:
+            pass
+        else:
+            ret += 1
+
+    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
+
+bot.run(bot_token.your_bot_token)
