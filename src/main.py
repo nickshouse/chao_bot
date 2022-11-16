@@ -3,7 +3,6 @@
 
 from typing import Optional
 import typing
-
 import bot_token
 import discord
 from discord import app_commands
@@ -19,6 +18,7 @@ class MyBot(commands.Bot):
 
 
 bot = MyBot()
+MY_GUILD=discord.Object(id=815388895994839071)
 
 
 @bot.event
@@ -28,21 +28,26 @@ async def on_ready():
 
 
 @bot.tree.command()
-async def hello(interaction: discord.Interaction):
+async def hellow(interaction: discord.Interaction):
     await interaction.response.send_message(f'Hi, {interaction.user.mention}')
 
 
-# Sync command, DM the bot
+
+""" Umbra's Sync command, DM the bot to use
+!sync   -> global sync
+!sync ~ -> sync current guild
+!sync * -> copies all global app commands to current guild and syncs
+!sync ^ -> clears all commands from the current guild target and syncs (removes guild commands)
+"""
 @bot.command()
 @commands.is_owner()
-async def sync(
-  ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[typing.Literal["~", "*", "^"]] = None) -> None:
+async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[typing.Literal["~", "*", "^"]] = None) -> None:
     if not guilds:
         if spec == "~":
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "*":
-            ctx.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            ctx.bot.tree.copy_global_to(guild=MY_GUILD)
+            synced = await ctx.bot.tree.sync(guild=MY_GUILD)
         elif spec == "^":
             ctx.bot.tree.clear_commands(guild=ctx.guild)
             await ctx.bot.tree.sync(guild=ctx.guild)
