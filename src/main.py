@@ -1,23 +1,24 @@
 # Some notes...
 # @bot.tree.command() registers a command to the CommandTree
+
+from discord.ext import commands
 from typing import Optional
 import typing
 import bot_token
 import discord
-from discord.ext import commands
-
+import logging
 
 class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(intents=discord.Intents.all(), command_prefix="!")
 
     async def setup_hook(self):
-        await self.load_extension("cogs.general")   # Paths use a . instead of a /
+        await self.load_extension("cogs.general")   # Extensions use a . instead of a /
 
 
 bot = MyBot()
-MY_GUILD=discord.Object(id=815388895994839071)
-
+MY_GUILD = discord.Object(id=815388895994839071)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 @bot.event
 async def on_ready():
@@ -66,5 +67,6 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
-    
-bot.run(bot_token.your_bot_token)
+
+
+bot.run(bot_token.your_bot_token, log_handler=handler)
