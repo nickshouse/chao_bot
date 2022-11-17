@@ -6,8 +6,8 @@ from typing import Optional
 import typing
 import bot_token
 import discord
-import logging
-import logging.handlers
+import logger
+
 
 class MyBot(commands.Bot):
     def __init__(self):
@@ -19,21 +19,6 @@ class MyBot(commands.Bot):
 
 bot = MyBot()
 MY_GUILD = discord.Object(id=815388895994839071)
-
-
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-logging.getLogger('discord.http').setLevel(logging.INFO)
-handler = logging.handlers.RotatingFileHandler(
-    filename='discord.log',
-    encoding='utf-8',
-    maxBytes=32 * 1024 * 1024,  # 32 MiB
-    backupCount=5,  # Rotate through 5 files
-)
-dt_fmt = '%Y-%m-%d %H:%M:%S'
-formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 @bot.event
@@ -84,5 +69,5 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 
-
+logger.log()
 bot.run(bot_token.your_bot_token, log_handler=None)
