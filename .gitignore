@@ -1,4 +1,4 @@
 __pycache__
 .vscode
 bot_token.py
-discord.log
+src/discord.log
