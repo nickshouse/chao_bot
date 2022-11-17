@@ -1,22 +1,33 @@
-# Imports
-import discord
-import random
-from time import sleep
+from discord import app_commands
 from discord.ext import commands
 
-
-# Class to hold functions for general commands
+# all cogs inherit from this base class
 class General(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot # adding a bot attribute for easier access
 
-    # Dice roller
-    @commands.command()
-    async def d(self, ctx, num: int, amount: int):
-        for i in range(amount):
-            await ctx.send(random.randint(1, num))
+    # adding a command to the cog
+    @commands.command(name="ping")
+    async def pingcmd(self, ctx):
+        """the best command in existence"""
+        await ctx.send(ctx.author.mention)
+    
+    # adding a slash command to the cog (make sure to sync this!)
+    @app_commands.command(name="ping")
+    async def slash_pingcmd(self, interaction):
+        """the second best command in existence"""
+        await interaction.response.send_message(interaction.user.mention)
 
+    # doing something when the cog gets loaded
+    async def cog_load(self):
+        print(f"{self.__class__.__name__} loaded!")
 
-# Setup function for cog
-async def setup(client):
-    await client.add_cog(General(client))
+    # doing something when the cog gets unloaded
+    async def cog_unload(self):
+        print(f"{self.__class__.__name__} unloaded!")
+
+# usually you’d use cogs in extensions
+# you would then define a global async function named 'setup', and it would take 'bot' as its only parameter
+async def setup(bot):
+    # finally, adding the cog to the bot
+    await bot.add_cog(General(bot=bot))

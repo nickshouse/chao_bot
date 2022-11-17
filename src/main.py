@@ -1,20 +1,18 @@
 # Some notes...
-# @client.tree.command() registers a command to the CommandTree
-
+# @bot.tree.command() registers a command to the CommandTree
 from typing import Optional
 import typing
 import bot_token
 import discord
-from discord import app_commands
 from discord.ext import commands
-
-
-MY_GUILD = discord.Object(id=815388895994839071)  # replace with your guild id
 
 
 class MyBot(commands.Bot):
     def __init__(self):
-        super().__init__(intents=discord.Intents.default(), command_prefix="!")
+        super().__init__(intents=discord.Intents.all(), command_prefix="!")
+
+    async def setup_hook(self):
+        await self.load_extension("cogs.general")   # Paths use a . instead of a /
 
 
 bot = MyBot()
@@ -30,7 +28,6 @@ async def on_ready():
 @bot.tree.command()
 async def hellow(interaction: discord.Interaction):
     await interaction.response.send_message(f'Hi, {interaction.user.mention}')
-
 
 
 """ Umbra's Sync command, DM the bot to use
@@ -69,5 +66,5 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
-
+    
 bot.run(bot_token.your_bot_token)
