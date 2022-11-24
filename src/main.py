@@ -1,12 +1,13 @@
 # Some notes...
 # @bot.tree.command() registers a command to the CommandTree
+# class MyBot(commands.Bot): means that MyBot extends from commands.Bot
 
 from discord.ext import commands
 from typing import Optional
 import typing
-import bot_token
 import discord
 import logger
+import bot_token
 
 
 class MyBot(commands.Bot):
@@ -17,6 +18,7 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.general")   # Extensions use a . instead of a /
 
 
+#bot = commands.Bot(intents=discord.Intents.all(), command_prefix="!")
 bot = MyBot()
 MY_GUILD = discord.Object(id=815388895994839071)
 
