@@ -9,13 +9,11 @@ class General(commands.Cog):
     # adding a command to the cog
     @commands.command(name="ping")
     async def pingcmd(self, ctx):
-        """the best command in existence"""
         await ctx.send(ctx.author.mention)
     
     # adding a slash command to the cog (make sure to sync this!)
     @app_commands.command(name="ping")
     async def slash_pingcmd(self, interaction):
-        """the second best command in existence"""
         await interaction.response.send_message(interaction.user.mention)
 
     # doing something when the cog gets loaded
@@ -26,8 +24,5 @@ class General(commands.Cog):
     async def cog_unload(self):
         print(f"{self.__class__.__name__} unloaded!")
 
-# usually you’d use cogs in extensions
-# you would then define a global async function named 'setup', and it would take 'bot' as its only parameter
 async def setup(bot):
-    # finally, adding the cog to the bot
     await bot.add_cog(General(bot=bot))
