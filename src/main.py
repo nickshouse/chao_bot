@@ -1,10 +1,10 @@
 # Some notes...
 # @bot.tree.command() registers a command to the CommandTree
 # class MyBot(commands.Bot): means that MyBot extends from commands.Bot
+# Extension paths use a . instead of a /
+# pip install discord
 
 from discord.ext import commands
-from typing import Optional
-import typing
 import discord
 import logger
 import bot_token
@@ -15,8 +15,8 @@ class MyBot(commands.Bot):
         super().__init__(intents=discord.Intents.all(), command_prefix="!")
 
     async def setup_hook(self):
-        await self.load_extension("cogs.general")   # Extensions use a . instead of a /
-
+        await self.load_extension("cogs.general")
+        await self.load_extension("cogs.sync")
 
 #bot = commands.Bot(intents=discord.Intents.all(), command_prefix="!")
 bot = MyBot()
@@ -29,47 +29,4 @@ async def on_ready():
     print('------')
 
 
-@bot.tree.command()
-async def hellow(interaction: discord.Interaction):
-    await interaction.response.send_message(f'Hi, {interaction.user.mention}')
-
-
-""" Umbra's Sync command, DM the bot to use
-!sync   -> global sync
-!sync ~ -> sync current guild
-!sync * -> copies all global app commands to current guild and syncs
-!sync ^ -> clears all commands from the current guild target and syncs (removes guild commands)
-"""
-@bot.command()
-@commands.is_owner()
-async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[typing.Literal["~", "*", "^"]] = None) -> None:
-    if not guilds:
-        if spec == "~":
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
-        elif spec == "*":
-            ctx.bot.tree.copy_global_to(guild=MY_GUILD)
-            synced = await ctx.bot.tree.sync(guild=MY_GUILD)
-        elif spec == "^":
-            ctx.bot.tree.clear_commands(guild=ctx.guild)
-            await ctx.bot.tree.sync(guild=ctx.guild)
-            synced = []
-        else:
-            synced = await ctx.bot.tree.sync()
-
-        await ctx.send(f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}")
-        return
-
-    ret = 0
-    for guild in guilds:
-        try:
-            await ctx.client.tree.sync(guild=guild)
-        except discord.HTTPException:
-            pass
-        else:
-            ret += 1
-
-    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
-
-
-logger.log()
-bot.run(bot_token.your_bot_token, log_handler=None)
+bot.run(bot_token.your_bot_token, log_handler=logger.log())
