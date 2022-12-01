@@ -2,3 +2,4 @@ __pycache__
 .vscode
 bot_token.py
 src/discord.log
+spec.txt
