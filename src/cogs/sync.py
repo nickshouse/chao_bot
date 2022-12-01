@@ -46,11 +46,9 @@ class Sync(commands.Cog):
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
         
-    # doing something when the cog gets loaded
+    # doing something when the cog gets loaded/unloaded
     async def cog_load(self):
         print(f"{self.__class__.__name__} loaded!")
-
-    # doing something when the cog gets unloaded
     async def cog_unload(self):
         print(f"{self.__class__.__name__} unloaded!")
 
