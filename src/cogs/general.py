@@ -7,14 +7,19 @@ class General(commands.Cog):
         self.bot = bot # adding a bot attribute for easier access
 
     # adding a command to the cog
-    @commands.command(name="ping")
+    @commands.command(name="ping", description="Pong!")
     async def pingcmd(self, ctx):
         await ctx.send(ctx.author.mention)
-    
+
+
     # adding a slash command to the cog (make sure to sync this!)
-    @app_commands.command(name="ping")
+    @app_commands.command(name="ping", description="Pong!")
     async def slash_pingcmd(self, interaction):
         await interaction.response.send_message(interaction.user.mention)
+
+    @app_commands.command(name="hello", description="Says hello")
+    async def hello(self, interaction):
+        await interaction.response.send_message(f'Hi, {interaction.user.mention}')
 
     # doing something when the cog gets loaded
     async def cog_load(self):
