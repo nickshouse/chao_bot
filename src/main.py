@@ -3,6 +3,7 @@
 # class MyBot(commands.Bot): means that MyBot extends from commands.Bot
 # Extension paths use a . instead of a /
 # pip install discord
+# pip install PIL
 
 from discord.ext import commands
 import discord
